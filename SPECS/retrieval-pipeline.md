@@ -5,28 +5,28 @@
 
 ## Scope
 - In:
-- Embed incoming question with `all-MiniLM-L6-v2`.
-- Query local persisted ChromaDB for top-k matches.
-- Return scored, sorted source candidates.
-- Apply minimum relevance threshold rule.
+    - Embed incoming question with `all-MiniLM-L6-v2`.
+    - Query local persisted ChromaDB for top-k matches.
+    - Return scored, sorted source candidates.
+    - Apply minimum relevance threshold rule.
 - Out:
-- Final answer wording strategy.
-- External document ingestion services.
+    - Final answer wording strategy.
+    - External document ingestion services.
 
 ## Requirements
 - Retrieval MUST use local FAQ corpus data only.
 - Retrieval MUST use local ChromaDB persistence (no remote vector DB).
 - Query flow:
-- Embed question with `all-MiniLM-L6-v2` via SentenceTransformers.
-- Query ChromaDB using `top_k`.
-- Map results to source items with `id`, `title`, `snippet`, `score`.
+    - Embed question with `all-MiniLM-L6-v2` via SentenceTransformers.
+    - Query ChromaDB using `top_k`.
+    - Map results to source items with `id`, `title`, `snippet`, `score`.
 - Sources MUST be sorted by descending relevance score.
 - If no document satisfies relevance threshold:
-- Retrieval result MUST be treated as unmatched.
-- Downstream response MUST use fallback behavior.
+    - Retrieval result MUST be treated as unmatched.
+    - Downstream response MUST use fallback behavior.
 - Retrieval metadata MUST include:
-- `top_k` as the effective query size.
-- `matched` as number of documents included in `sources`.
+    - `top_k` as the effective query size.
+    - `matched` as number of documents included in `sources`.
 - Retrieval behavior MUST be deterministic for the same corpus and input.
 
 ## Acceptance Criteria
@@ -35,4 +35,3 @@
 - [ ] Source list is sorted by score descending.
 - [ ] Unknown/out-of-domain query triggers unmatched retrieval path.
 - [ ] Retrieval metadata reports `top_k` and `matched` accurately.
-

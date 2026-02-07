@@ -5,15 +5,15 @@
 
 ## Scope
 - In:
-- Implement `GET /health`.
-- Return a deterministic JSON body and HTTP 200.
+    - Implement `GET /health`.
+    - Return a deterministic JSON body and HTTP 200.
 - Out:
-- Metrics, dependency health checks, authentication, and readiness/liveness split.
+    - Metrics, dependency health checks, authentication, and readiness/liveness split.
 
 ## Requirements
 - `GET /health` MUST return HTTP 200.
 - Response body MUST be exactly:
-- `{ "status": "ok" }`
+    - `{ "status": "ok" }`
 - Response content type MUST be JSON.
 - Endpoint behavior MUST be deterministic and independent of retrieval/generation subsystems.
 
@@ -21,4 +21,3 @@
 - [ ] Calling `GET /health` returns status code `200`.
 - [ ] Response JSON includes key `status` with value `ok`.
 - [ ] No API keys, external services, or model downloads are required.
-

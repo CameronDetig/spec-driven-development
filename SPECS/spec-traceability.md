@@ -5,11 +5,11 @@
 
 ## Scope
 - In:
-- Mapping of each spec to planned test files.
-- Mapping of each spec to planned application modules.
+    - Mapping of each spec to planned test files.
+    - Mapping of each spec to planned application modules.
 - Out:
-- Detailed test-case code.
-- Release management process.
+    - Detailed test-case code.
+    - Release management process.
 
 ## Requirements
 - Every feature spec in `SPECS/` MUST map to at least one test file.
@@ -23,24 +23,26 @@
 
 ## Mapping
 - `SPECS/health-endpoint.md`
-- Tests: `tests/test_health.py`
-- Implementation: `app/main.py`
+    - Tests: `tests/test_health.py`
+    - Implementation: `app/main.py`
 - `SPECS/ask-endpoint-validation.md`
-- Tests: `tests/test_validation.py`
-- Implementation: `app/models.py`, `app/main.py`
+    - Tests: `tests/test_validation.py`
+    - Implementation: `app/models.py`, `app/main.py`
 - `SPECS/retrieval-pipeline.md`
-- Tests: `tests/test_retrieval.py`
-- Implementation: `app/retrieval.py`
+    - Tests: `tests/test_retrieval.py`
+    - Implementation: `app/retrieval.py`
 - `SPECS/generation-mock.md`
-- Tests: `tests/test_retrieval.py`, `tests/test_contract.py`
-- Implementation: `app/generation.py`
+    - Tests: `tests/test_retrieval.py`, `tests/test_contract.py`
+    - Implementation: `app/generation.py`
 - `SPECS/generation-optional-llm.md`
-- Tests: `tests/test_generator_config.py` (optional/non-blocking), existing suite in mock mode
-- Implementation: `app/generation.py`, `app/main.py`
+    - Tests: `tests/test_generator_config.py` (optional/non-blocking), existing suite in mock mode
+    - Implementation: `app/generation.py`, `app/main.py`
 - `SPECS/ask-response-contract.md`
-- Tests: `tests/test_contract.py`
-- Implementation: `app/models.py`, `app/main.py`
+    - Tests: `tests/test_contract.py`
+    - Implementation: `app/models.py`, `app/main.py`
 - `SPECS/faq-data.md`
-- Tests: `tests/test_data_loader.py`, `tests/test_retrieval.py`
-- Implementation: `app/retrieval.py`, `data/faq/*`
-
+    - Tests: `tests/test_data_loader.py`, `tests/test_retrieval.py`
+    - Implementation: `app/retrieval.py`, `data/faq/*`
+- `SPECS/streamlit-ui.md`
+    - Tests: `tests/test_streamlit_smoke.py` (optional smoke), manual acceptance checks
+    - Implementation: `ui/streamlit_app.py`

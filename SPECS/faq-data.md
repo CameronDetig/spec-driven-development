@@ -5,28 +5,28 @@
 
 ## Scope
 - In:
-- Local FAQ files under `data/faq/`.
-- Required document fields and minimum corpus breadth.
-- Deterministic, test-friendly content expectations.
+    - Local FAQ files under `data/faq/`.
+    - Required document fields and minimum corpus breadth.
+    - Deterministic, test-friendly content expectations.
 - Out:
-- External content sources or dynamic ingestion pipelines.
+    - External content sources or dynamic ingestion pipelines.
 
 ## Requirements
 - Corpus MUST contain between 8 and 15 documents.
 - Corpus content MUST represent the fictitious institution name as `Mockridge Bank`.
 - Each document MUST include:
-- `id`
-- `title`
-- `body`
+    - `id`
+    - `title`
+    - `body`
 - Corpus MUST represent core Mockridge Bank topics, including:
-- checking accounts
-- savings accounts
-- auto loans
-- credit cards
-- overdraft fees
-- fraud/disputes
-- mobile app
-- support hours
+    - checking accounts
+    - savings accounts
+    - auto loans
+    - credit cards
+    - overdraft fees
+    - fraud/disputes
+    - mobile app
+    - support hours
 - Document content MUST be stable and human-readable.
 - Corpus format MAY be markdown or JSON, but parser behavior MUST be documented.
 - IDs MUST be unique across corpus.
