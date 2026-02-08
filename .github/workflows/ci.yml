@@ -43,4 +43,4 @@ jobs:
           python -m pip install tox
 
       - name: Run tests
-        run: python run.py test-matrix
+        run: python -m tox -e py${{ replace(matrix.python-version, '.', '') }}
