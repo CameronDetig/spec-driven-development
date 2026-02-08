@@ -63,6 +63,7 @@ If implementation changes behavior, specs/tests must be updated in the same chan
 - Must pass before merge:
   - `python -m pytest -q` (or `python run.py test`)
   - `python run.py test-matrix` for available local interpreters
+  - GitHub Actions CI workflow (Python 3.10/3.11/3.12) on the target branch/PR
 - For behavior-affecting changes:
   - relevant spec files in `SPECS/` updated
   - traceability preserved (spec -> tests -> implementation)
@@ -105,5 +106,5 @@ If implementation changes behavior, specs/tests must be updated in the same chan
 - [ ] No secrets or external paid API requirements introduced
 
 ### 9.3 After Merge (if applicable)
-- [ ] Follow-up docs updated (`constitution.md`, `SPECS/`, project brief files)
+- [ ] Follow-up docs updated (`constitution.md`, `SPECS/`, `README.md`)
 - [ ] Any deferred risks tracked explicitly

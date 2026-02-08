@@ -40,6 +40,7 @@
 - `run.py setup` SHOULD support optional automated Python installation via `--install-python` and fail clearly if package-manager installation is unavailable.
 - `fullstack` command MUST start API and UI on their default ports and shut down cleanly on Ctrl+C.
 - Commands MUST print clear status messages and fail clearly with actionable errors.
+- `test` and `test-matrix` commands SHOULD be suitable for GitHub Actions CI execution without interactive prompts.
 - Docker helper commands MUST fail clearly when Docker is unavailable and MUST keep local non-Docker commands fully usable.
 
 ## Acceptance Criteria

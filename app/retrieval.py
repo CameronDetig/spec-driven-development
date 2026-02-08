@@ -368,9 +368,6 @@ def retrieve(question: str, top_k: int) -> list[RetrievedDoc]:
         return []
 
     min_score = get_min_score()
-    if _LEXICAL_FALLBACK_READY:
-        return _lexical_search(question=question, docs=docs, top_k=top_k, min_score=min_score)
-
     collection = _get_collection()
     try:
         _ensure_indexed(collection, docs)
@@ -417,7 +414,7 @@ def retrieve(question: str, top_k: int) -> list[RetrievedDoc]:
                 )
 
         matches.sort(key=lambda item: item.score, reverse=True)
-        _LEXICAL_FALLBACK_READY = False
+        _LEXICAL_FALLBACK_READY = False  # clear fallback once embedding path succeeds
         return matches[:top_k]
     except Exception:
         _LEXICAL_FALLBACK_READY = True
