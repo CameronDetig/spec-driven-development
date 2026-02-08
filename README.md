@@ -22,6 +22,10 @@ Spec-driven local RAG assistant built with FastAPI + Streamlit.
 - LangChain (`langchain`, `langchain-huggingface`, `langchain-chroma`)
 - pytest
 
+## Preview
+
+<img src="images/streamlit_ui.png" alt="Streamlit UI" width="600">
+
 ## Quick Start
 
 ### 1) Setup
