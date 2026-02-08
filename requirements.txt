@@ -9,6 +9,10 @@ sentence-transformers>=3.0,<4.0
 transformers>=4.44,<5.0
 torch>=2.3,<3.0
 sentencepiece>=0.2,<0.3
+langchain>=0.3,<0.4
+langchain-core>=0.3,<0.4
+langchain-huggingface>=0.1,<0.2
+langchain-chroma>=0.1,<0.2
 
 # UI
 streamlit>=1.37,<2.0
