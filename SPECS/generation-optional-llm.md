@@ -5,7 +5,7 @@
 
 ## Scope
 - In:
-    - Support `RAG_GENERATOR=distilgpt2`.
+    - Support `generator=distilgpt2` request option.
     - Implement a separate generator path backed by Hugging Face `transformers`.
     - Document runtime behavior and first-run model download expectations.
 - Out:
@@ -13,18 +13,20 @@
     - Any requirement for LLM mode during tests.
 
 ## Requirements
-- LLM mode MUST be opt-in via environment variable:
-    - `RAG_GENERATOR=distilgpt2`
+- LLM mode MUST be opt-in via request field:
+    - `generator=distilgpt2`
 - Default mode MUST remain `mock`.
 - LLM mode MUST NOT be required to start or test default application workflow.
 - If LLM mode is selected and model assets are unavailable:
     - System MUST fail clearly with actionable local setup guidance.
+    - UI MUST instruct user to run `python run.py setup --with-llm`.
 - LLM mode MUST NOT require secrets or API keys.
 - Repository MUST NOT commit model weight files.
 - Documentation MUST clearly state:
     - LLM mode is optional.
     - First-run download size/cost is local disk/network only.
     - Tests run without LLM mode.
+    - How to install LLM assets via `python run.py setup --with-llm`.
 
 ## Related Specifications
 - `generation-mock.md` - Default deterministic generator (required for tests)
@@ -32,6 +34,6 @@
 
 ## Acceptance Criteria
 - [x] With default environment, app uses mock generator. (test_generator_config.py::test_default_generator_mode_is_mock_deterministic)
-- [x] With `RAG_GENERATOR=distilgpt2`, app routes generation through LLM adapter. (test_generator_config.py::test_distilgpt2_mode_is_opt_in_and_fails_clearly_when_unavailable)
+- [x] With `generator=distilgpt2`, app routes generation through LLM adapter. (test_generator_config.py::test_distilgpt2_mode_is_opt_in_and_fails_clearly_when_unavailable)
 - [x] Test suite does not depend on `distilgpt2`. (conftest.py::default_generator_env)
 - [ ] Documentation explains optional setup and non-requirement for tests.

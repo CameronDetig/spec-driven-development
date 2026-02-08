@@ -21,8 +21,11 @@
 - UI MUST be a single-page interface.
 - UI MUST NOT implement authentication, authorization, or user accounts.
 - UI MUST include:
+    - DB status indicator from `GET /db/status`.
+    - Build DB action button that calls `POST /db/build`.
     - Question text input.
     - `top_k` control constrained to `1..5` with default `3`.
+    - Generator selector with `mock` (default) and `distilgpt2` options.
     - Submit action to call API endpoint `POST /ask`.
 - On success (`200`), UI MUST display:
     - `answer`
@@ -30,6 +33,8 @@
     - `retrieval.top_k` and `retrieval.matched`
 - On fallback responses (`sources=[]`), UI MUST clearly indicate no matching sources were found.
 - On API validation errors (`400`), UI MUST show clear, non-crashing feedback to user.
+- If DB status is not built, question input and submit controls MUST be disabled until build succeeds.
+- If `distilgpt2` is selected and model assets are missing, UI MUST instruct the user to run `python run.py setup --with-llm`.
 - UI MUST not require optional LLM mode; default mock mode must be fully supported.
 - UI MUST not embed secrets or credentials in code.
 

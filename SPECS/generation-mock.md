@@ -13,7 +13,7 @@
     - Probabilistic/creative generation behavior.
 
 ## Requirements
-- Default generator MUST be selected when `RAG_GENERATOR` is unset or set to `mock`.
+- Default generator MUST be selected when no generator is specified or when `generator=mock`.
 - Generator MUST not require network access, API keys, or model downloads.
 - For matched retrieval:
     - Answer MUST be constructed from retrieved content deterministically.

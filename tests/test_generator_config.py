@@ -27,18 +27,13 @@ def test_distilgpt2_mode_is_opt_in_and_fails_clearly_when_unavailable(monkeypatc
     Spec: generation-optional-llm.md
     Acceptance Criteria: "With `RAG_GENERATOR=distilgpt2`, app routes generation through LLM adapter"
     """
-    # Ensure the app module is imported after setting env.
-    monkeypatch.setenv("RAG_GENERATOR", "distilgpt2")
-
-    import importlib
-    import sys
-
-    sys.modules.pop("app.main", None)
-    app_module = importlib.import_module("app.main")
     from fastapi.testclient import TestClient
 
-    client = TestClient(app_module.app)
-    payload = {"question": "What credit card options do you have?", "top_k": 3}
+    payload = {
+        "question": "What credit card options do you have?",
+        "top_k": 3,
+        "generator": "distilgpt2",
+    }
     response = client.post("/ask", json=payload)
 
     # Accept success (if model is available) or explicit runtime failure.

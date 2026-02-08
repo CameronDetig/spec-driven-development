@@ -121,8 +121,8 @@ Default generator (used in tests):
 
 Optional generator (runtime only):
 - `distilgpt2` via `transformers`.
-- Enabled with `RAG_GENERATOR=distilgpt2` (optional).
-- First run downloads ~330MB.
+- Selected per request (UI dropdown or `generator=distilgpt2`).
+- Model assets are installed via `python run.py setup --with-llm`.
 - Must not be required for tests.
 - If unavailable, fail clearly with actionable guidance.
 
@@ -155,9 +155,8 @@ Coverage is defined by the specs in `SPECS/` and implemented in `tests/`.
 Optional only. Defaults are applied when unset. Reviewers should not need to set any values.
 An example file is provided at `.env.example`.
 
-- `RAG_GENERATOR=mock` (default)
-- `RAG_GENERATOR=distilgpt2` (optional)
 - `RAG_MIN_SCORE=0.25` (default relevance threshold)
+- `API_URL` (optional override for Streamlit to reach API)
 
 ---
 

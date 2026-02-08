@@ -17,6 +17,7 @@
 - Request schema:
     - `question` is required string with length `5..300`.
     - `top_k` is optional integer with default `3` and valid range `1..5`.
+    - `generator` is optional string with allowed values `mock` or `distilgpt2`.
 - Validation failures MUST return HTTP 400.
 - Validation failures include:
     - Missing `question`.
@@ -24,9 +25,11 @@
     - `question` length above 300.
     - `top_k` below 1.
     - `top_k` above 5.
+    - `generator` not in allowed values.
 - Error responses MUST be JSON and machine-parseable.
 - Error responses MUST include a top-level `detail` field suitable for user-facing validation feedback.
 - Validation MUST run before retrieval or generation logic executes.
+- If DB is not built, endpoint MUST return `503` with actionable guidance to build DB first.
 
 ## Related Specifications
 - `ask-response-contract.md` - Defines success response schema for valid requests

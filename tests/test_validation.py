@@ -266,3 +266,19 @@ def test_ask_question_with_unicode_is_allowed(client):
     payload = {"question": "¿Cuáles son las tarifas de sobregiro?", "top_k": 3}
     response = client.post("/ask", json=payload)
     assert response.status_code == 200
+
+
+@pytest.mark.validation
+@pytest.mark.integration
+def test_ask_generator_invalid_returns_400(client):
+    """
+    Verify that POST /ask returns 400 when generator is not an allowed value.
+    
+    Spec: ask-endpoint-validation.md
+    Requirement: "`generator` is optional string with allowed values `mock` or `distilgpt2`"
+    """
+    payload = {"question": "What are your overdraft fees?", "top_k": 3, "generator": "gpt4"}
+    response = client.post("/ask", json=payload)
+    assert response.status_code == 400
+    assert response.headers.get("content-type", "").startswith("application/json")
+    assert "detail" in response.json()

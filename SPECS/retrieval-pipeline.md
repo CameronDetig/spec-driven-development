@@ -7,6 +7,7 @@
 - In:
     - Embed incoming question with `all-MiniLM-L6-v2`.
     - Query local persisted ChromaDB for top-k matches.
+    - Expose DB lifecycle endpoints for build/status.
     - Return scored, sorted source candidates.
     - Apply minimum relevance threshold rule.
 - Out:
@@ -16,6 +17,9 @@
 ## Requirements
 - Retrieval MUST use local FAQ corpus data only.
 - Retrieval MUST use local ChromaDB persistence (no remote vector DB).
+- API MUST expose:
+    - `GET /db/status` with DB build status and counts.
+    - `POST /db/build` to build/index FAQ embeddings.
 - Query flow:
     - Embed question with `all-MiniLM-L6-v2` via SentenceTransformers.
     - Query ChromaDB using `top_k`.
@@ -31,6 +35,7 @@
     - `top_k` as the effective query size.
     - `matched` as number of documents included in `sources`.
 - Retrieval behavior MUST be deterministic for the same corpus and input.
+- If retrieval DB is not built, `/ask` MUST return `503` with actionable guidance.
 
 ## Related Specifications
 - `faq-data.md` - Defines corpus structure that retrieval depends on
@@ -43,3 +48,5 @@
 - [x] Source list is sorted by score descending. (test_retrieval.py::test_sources_are_sorted_by_descending_score)
 - [x] Unknown/out-of-domain query triggers unmatched retrieval path. (test_retrieval.py::test_unknown_query_returns_fallback_with_empty_sources)
 - [x] Retrieval metadata reports `top_k` and `matched` accurately. (test_contract.py::test_ask_response_retrieval_metadata_has_required_fields)
+- [ ] `GET /db/status` reports whether DB is built and indexed counts. (manual acceptance)
+- [ ] `POST /db/build` builds the DB and makes status built=true. (manual acceptance)

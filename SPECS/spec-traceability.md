@@ -29,7 +29,7 @@
     - Tests: `tests/test_validation.py`
     - Implementation: `app/models.py`, `app/main.py`
 - `SPECS/retrieval-pipeline.md`
-    - Tests: `tests/test_retrieval.py`
+    - Tests: `tests/test_retrieval.py`, `tests/test_db.py`
     - Implementation: `app/retrieval.py`
 - `SPECS/generation-mock.md`
     - Tests: `tests/test_determinism.py`, `tests/test_retrieval.py`, `tests/test_contract.py`

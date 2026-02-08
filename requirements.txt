@@ -8,9 +8,11 @@ chromadb>=0.5,<1.0
 sentence-transformers>=3.0,<4.0
 transformers>=4.44,<5.0
 torch>=2.3,<3.0
+sentencepiece>=0.2,<0.3
 
 # UI
 streamlit>=1.37,<2.0
+requests>=2.32,<3.0
 
 # Testing
 pytest>=8.2,<9.0
