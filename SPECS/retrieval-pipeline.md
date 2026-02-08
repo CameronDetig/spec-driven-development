@@ -52,5 +52,5 @@
 - [x] Source list is sorted by score descending. (test_retrieval.py::test_sources_are_sorted_by_descending_score)
 - [x] Unknown/out-of-domain query triggers unmatched retrieval path. (test_retrieval.py::test_unknown_query_returns_fallback_with_empty_sources)
 - [x] Retrieval metadata reports `top_k` and `matched` accurately. (test_contract.py::test_ask_response_retrieval_metadata_has_required_fields)
-- [ ] `GET /db/status` reports whether DB is built and indexed counts. (manual acceptance)
-- [ ] `POST /db/build` builds the DB and makes status built=true. (manual acceptance)
+- [X] `GET /db/status` reports whether DB is built and indexed counts. (manual acceptance)
+- [X] `POST /db/build` builds the DB and makes status built=true. (manual acceptance)

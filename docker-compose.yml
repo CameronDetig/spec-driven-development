@@ -10,10 +10,10 @@ services:
       - ./data:/app/data
       - ./chroma:/app/chroma
   ui:
-    image: python:3.11-slim
+    build: .
     working_dir: /app
     volumes:
-      - .:/app
+      - ./ui:/app/ui
     command: ["python", "-m", "streamlit", "run", "ui/streamlit_app.py", "--server.port", "8501", "--server.address", "0.0.0.0"]
     ports:
       - "8501:8501"

@@ -6,12 +6,13 @@
 Spec-driven local RAG assistant built with FastAPI + Streamlit.
 
 ## What It Does
-- Accepts customer FAQ questions through API or UI
+- Answers customer questions relating to products and services for a fictional bank (Mockridge Bank) 
+- Available through API or Streamlit UI
 - Retrieves relevant local FAQ documents from ChromaDB
 - Generates answers with:
-  - deterministic `mock` mode (default, test-friendly)
-  - optional `flan-t5` mode (small instruction-tuned LLM)
-- Returns answer + cited sources + retrieval metadata
+  - `mock` deterministic mode (default, test-friendly)
+  - `flan-t5` optional mode (small locally running instruction-tuned LLM, no API key required)
+- Returns answer + cited sources
 
 ## Tech Stack
 - Python 3.10, 3.11, or 3.12
@@ -33,7 +34,7 @@ What setup does:
 - installs dependencies
 - builds retrieval DB
 
-Optional LLM assets:
+If you want to be able to use the LLM option, run setup with this command. It will download the flan-t5 model (~300MB):
 ```bash
 python run.py setup --with-llm
 ```
@@ -46,6 +47,11 @@ python run.py fullstack
 Endpoints:
 - API: `http://127.0.0.1:8000`
 - UI: `http://127.0.0.1:8501`
+
+### API Documentation
+When the API is running, interactive documentation is available at:
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
 
 ## Run Commands
 
@@ -114,13 +120,13 @@ Example request:
 
 ## Environment Variables
 
-- `RAG_MIN_SCORE` (default `0.25`)
+- `RAG_MIN_SCORE` (minimum similarity score for retrieved documents. default: `0.25`)
 - `API_URL` (used by Streamlit UI; default `http://127.0.0.1:8000`)
 
 ## Project Structure
 
 - `app/main.py` API routes
-- `app/retrieval.py` retrieval/indexing logic
+- `app/retrieval.py` RAG retrieval/indexing logic
 - `app/generation.py` generator selection and LLM adapter
 - `app/rag_chain.py` LangChain prompt/chain
 - `ui/streamlit_app.py` UI
@@ -131,3 +137,4 @@ Example request:
 ## Notes
 - Default mode is deterministic and intended for local testing/CI.
 - Optional `flan-t5` mode uses Google's Flan-T5-small (80M params) for local experimentation and requires model assets (~308MB download via `python run.py setup --with-llm`).
+- Project uses CPU-only PyTorch for faster setup and smaller footprint (~200MB vs ~2.5GB). GPU acceleration is unnecessary for the small models used in this project.

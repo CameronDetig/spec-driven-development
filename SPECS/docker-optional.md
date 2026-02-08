@@ -29,7 +29,7 @@
     - How to build and run Docker services
 
 ## Acceptance Criteria
-- [ ] Project runs locally without Docker and all required tests execute.
-- [ ] API can be built and started via Docker.
-- [ ] Optional compose workflow can start API and UI together.
-- [ ] Documentation clearly separates optional Docker commands from default local workflow.
+- [x] Project runs locally without Docker and all required tests execute.
+- [x] API can be built and started via Docker. (Dockerfile, docker-compose.yml::api)
+- [x] Optional compose workflow can start API and UI together. (docker-compose.yml, run.py::cmd_docker_fullstack)
+- [x] Documentation clearly separates optional Docker commands from default local workflow. (README.md)

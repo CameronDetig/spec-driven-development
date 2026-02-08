@@ -51,14 +51,14 @@
 - `generation-mock.md` - Default generator that UI relies on
 
 ## Acceptance Criteria
-- [ ] User can enter a valid question, submit, and view answer output. (manual acceptance)
-- [ ] User can change `top_k` and see reflected retrieval metadata. (manual acceptance)
-- [ ] User can switch generator between `mock` and `flan-t5` from the same control row as `top_k`. (manual acceptance)
-- [ ] Source citations are rendered when present. (manual acceptance)
-- [ ] Fallback path is visible and understandable when no matches exist. (manual acceptance)
-- [ ] Validation errors are shown in the UI without app crash. (manual acceptance)
+- [X] User can enter a valid question, submit, and view answer output. (manual acceptance)
+- [X] User can change `top_k` and see reflected retrieval metadata. (manual acceptance)
+- [X] User can switch generator between `mock` and `flan-t5` from the same control row as `top_k`. (manual acceptance)
+- [X] Source citations are rendered when present. (manual acceptance)
+- [X] Fallback path is visible and understandable when no matches exist. (manual acceptance)
+- [X] Validation errors are shown in the UI without app crash. (manual acceptance)
 - [x] UI runs locally against the API in default mock mode. (test_streamlit_smoke.py::test_streamlit_app_module_imports)
 - [x] DB status payload is normalized to `built` and `doc_count` for UI consumption. (tests/test_streamlit_ui_logic.py::test_get_db_status_normalizes_payload)
 - [x] DB status helper surfaces HTTP failures without crashing the UI flow. (tests/test_streamlit_ui_logic.py::test_get_db_status_handles_non_200)
-- [ ] UI is implemented as a single page. (manual acceptance)
-- [ ] UI is accessible without authentication or account flows. (manual acceptance)
+- [X] UI is implemented as a single page. (manual acceptance)
+- [X] UI is accessible without authentication or account flows. (manual acceptance)

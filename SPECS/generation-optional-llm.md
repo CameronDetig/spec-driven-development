@@ -37,4 +37,4 @@
 - [x] With default environment, app uses mock generator. (test_generator_config.py::test_default_generator_mode_is_mock_deterministic)
 - [x] With `generator=flan-t5`, app routes generation through LLM adapter. (test_generator_config.py::test_flan_t5_mode_is_opt_in_and_fails_clearly_when_unavailable)
 - [x] Test suite does not depend on `flan-t5`. (conftest.py::default_generator_env)
-- [ ] Documentation explains optional setup and non-requirement for tests.
+- [x] Documentation explains optional setup and non-requirement for tests. (README.md sections: Quick Start, Notes)
