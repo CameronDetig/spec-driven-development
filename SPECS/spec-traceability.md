@@ -49,3 +49,6 @@
 - `SPECS/entrypoint-cli.md`
     - Tests: `tests/test_cli.py`, manual acceptance checks
     - Implementation: `run.py`
+- `SPECS/docker-optional.md`
+    - Tests: manual acceptance checks
+    - Implementation: `Dockerfile`, `docker-compose.yml` (optional)
