@@ -5,7 +5,7 @@
 
 ## Scope
 - In:
-    - Local FAQ files under `data/faq/`.
+    - Local FAQ files under `data/`.
     - Required document fields and minimum corpus breadth.
     - Deterministic, test-friendly content expectations.
 - Out:

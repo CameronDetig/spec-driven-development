@@ -81,7 +81,7 @@ and enforced by `tests/`.
 ## Data Requirements
 
 Local FAQ corpus for Mockridge Bank:
-- Location: `data/faq/`
+- Location: `data/`
 - Format: Markdown or JSON
 - Size: 8–15 documents
 - Each document must include `id`, `title`, `body`
@@ -142,7 +142,7 @@ Coverage is defined by the specs in `SPECS/` and implemented in `tests/`.
 - `app/retrieval.py` ChromaDB + embeddings
 - `app/generation.py` mock + optional LLM generator
 - `run.py` cross-platform entry point for setup, run, and test commands
-- `data/faq/*` local FAQ corpus
+- `data/*` local FAQ corpus
 - `ui/streamlit_app.py` single-page Streamlit UI
 - `tests/` pytest suite
 - `pytest.ini` test configuration

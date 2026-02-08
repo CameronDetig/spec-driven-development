@@ -42,7 +42,7 @@
     - Implementation: `app/models.py`, `app/main.py`
 - `SPECS/faq-data.md`
     - Tests: `tests/test_data_loader.py`, `tests/test_retrieval.py`
-    - Implementation: `app/retrieval.py`, `data/faq/*`
+    - Implementation: `app/retrieval.py`, `data/*`
 - `SPECS/streamlit-ui.md`
     - Tests: `tests/test_streamlit_smoke.py` (optional smoke), manual acceptance checks
     - Implementation: `ui/streamlit_app.py`

@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 
-FAQ_DIR = Path("data/faq")
+FAQ_DIR = Path("data")
 
 
 def _extract_markdown_fields(path: Path) -> dict:
@@ -41,12 +41,12 @@ def _load_docs():
 @pytest.mark.unit
 def test_faq_directory_exists():
     """
-    Verify that the FAQ corpus directory exists at data/faq/.
+    Verify that the FAQ corpus directory exists at data/.
     
     Spec: faq-data.md
     Requirement: "Corpus MUST be local and committed to repository"
     """
-    assert FAQ_DIR.exists(), "Expected FAQ directory at data/faq"
+    assert FAQ_DIR.exists(), "Expected FAQ directory at data"
     assert FAQ_DIR.is_dir()
 
 
@@ -75,7 +75,7 @@ def test_faq_docs_have_required_fields_and_non_empty_values():
     Acceptance Criteria: "Data loader can parse all corpus files without runtime errors"
     """
     docs = _load_docs()
-    assert docs, "No FAQ docs found in data/faq"
+    assert docs, "No FAQ docs found in data"
 
     for doc in docs:
         assert set(doc.keys()) == {"id", "title", "body"}
