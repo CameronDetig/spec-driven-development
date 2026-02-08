@@ -53,6 +53,30 @@ def test_run_py_help_command_prints_usage(monkeypatch):
 
 
 @pytest.mark.integration
+def test_run_py_setup_help_includes_python_selection_flags():
+    """
+    Verify that setup help includes interpreter-selection and install flags.
+
+    Spec: entrypoint-cli.md
+    Requirement: "`run.py setup` supports interpreter override and optional install flow"
+    """
+    if not RUN_PY.exists():
+        pytest.skip("run.py not yet implemented")
+
+    result = subprocess.run(
+        [sys.executable, str(RUN_PY), "setup", "--help"],
+        capture_output=True,
+        text=True,
+        timeout=10,
+    )
+
+    assert result.returncode == 0
+    output = result.stdout.lower()
+    assert "--python" in output
+    assert "--install-python" in output
+
+
+@pytest.mark.integration
 def test_run_py_test_command_executes_pytest():
     """
     Verify that 'python run.py test' runs pytest successfully.

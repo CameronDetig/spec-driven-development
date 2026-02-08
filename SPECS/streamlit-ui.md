@@ -21,11 +21,16 @@
 - UI MUST be a single-page interface.
 - UI MUST NOT implement authentication, authorization, or user accounts.
 - UI MUST include:
-    - DB status indicator from `GET /db/status`.
+    - Scrollable chat-style message window.
+    - Initial assistant welcome message on load.
+    - Minimal DB status indicator showing only `built` and `doc_count` from `GET /db/status`.
     - Build DB action button that calls `POST /db/build`.
     - Question text input.
-    - `top_k` control constrained to `1..5` with default `3`.
-    - Generator selector with `mock` (default) and `distilgpt2` options.
+    - `top_k` control constrained to `1..5` with default `3`, displayed inline with generator selection.
+    - Generator selector with `mock` (default) and `distilgpt2` options, displayed inline with `top_k`.
+    - Three clickable example query buttons below the message input.
+    - `Clear Chat` button and `Submit` button positioned directly below message input.
+    - `Clear Chat` button visible only after at least one user message exists.
     - Submit action to call API endpoint `POST /ask`.
 - On success (`200`), UI MUST display:
     - `answer`
@@ -46,9 +51,12 @@
 ## Acceptance Criteria
 - [ ] User can enter a valid question, submit, and view answer output. (manual acceptance)
 - [ ] User can change `top_k` and see reflected retrieval metadata. (manual acceptance)
+- [ ] User can switch generator between `mock` and `distilgpt2` from the same control row as `top_k`. (manual acceptance)
 - [ ] Source citations are rendered when present. (manual acceptance)
 - [ ] Fallback path is visible and understandable when no matches exist. (manual acceptance)
 - [ ] Validation errors are shown in the UI without app crash. (manual acceptance)
 - [x] UI runs locally against the API in default mock mode. (test_streamlit_smoke.py::test_streamlit_app_module_imports)
+- [x] DB status payload is normalized to `built` and `doc_count` for UI consumption. (tests/test_streamlit_ui_logic.py::test_get_db_status_normalizes_payload)
+- [x] DB status helper surfaces HTTP failures without crashing the UI flow. (tests/test_streamlit_ui_logic.py::test_get_db_status_handles_non_200)
 - [ ] UI is implemented as a single page. (manual acceptance)
 - [ ] UI is accessible without authentication or account flows. (manual acceptance)

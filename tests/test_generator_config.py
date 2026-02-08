@@ -20,15 +20,13 @@ def test_default_generator_mode_is_mock_deterministic(client):
 
 @pytest.mark.optional
 @pytest.mark.integration
-def test_distilgpt2_mode_is_opt_in_and_fails_clearly_when_unavailable(monkeypatch):
+def test_distilgpt2_mode_is_opt_in_and_fails_clearly_when_unavailable(client):
     """
     Verify that distilgpt2 mode routes through LLM adapter or fails clearly if unavailable.
     
     Spec: generation-optional-llm.md
     Acceptance Criteria: "With `RAG_GENERATOR=distilgpt2`, app routes generation through LLM adapter"
     """
-    from fastapi.testclient import TestClient
-
     payload = {
         "question": "What credit card options do you have?",
         "top_k": 3,

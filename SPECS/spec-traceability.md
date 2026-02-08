@@ -44,7 +44,7 @@
     - Tests: `tests/test_data_loader.py`, `tests/test_retrieval.py`
     - Implementation: `app/retrieval.py`, `data/*`
 - `SPECS/streamlit-ui.md`
-    - Tests: `tests/test_streamlit_smoke.py` (optional smoke), manual acceptance checks
+    - Tests: `tests/test_streamlit_smoke.py`, `tests/test_streamlit_ui_logic.py`, manual acceptance checks
     - Implementation: `ui/streamlit_app.py`
 - `SPECS/entrypoint-cli.md`
     - Tests: `tests/test_cli.py`, manual acceptance checks
