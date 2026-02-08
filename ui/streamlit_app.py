@@ -1,4 +1,5 @@
 import os
+from html import escape
 
 import requests
 import streamlit as st
@@ -34,6 +35,32 @@ def main() -> None:
             [data-testid="stHeader"] {
                 height: 0rem;
             }
+            .chat-row {
+                display: flex;
+                margin: 0.35rem 0;
+            }
+            .chat-row.user {
+                justify-content: flex-end;
+            }
+            .chat-row.assistant {
+                justify-content: flex-start;
+            }
+            .chat-bubble {
+                max-width: 78%;
+                padding: 0.6rem 0.8rem;
+                border-radius: 0.9rem;
+                line-height: 1.35;
+                word-wrap: break-word;
+                color: #111111;
+            }
+            .chat-row.user .chat-bubble {
+                background: #d8ebff;
+                border-bottom-right-radius: 0.25rem;
+            }
+            .chat-row.assistant .chat-bubble {
+                background: #f2f3f5;
+                border-bottom-left-radius: 0.25rem;
+            }
         </style>
         """,
         unsafe_allow_html=True,
@@ -51,6 +78,10 @@ def main() -> None:
         st.session_state.question_input = ""
     if "pending_example" not in st.session_state:
         st.session_state.pending_example = None
+    if "pending_submission" not in st.session_state:
+        st.session_state.pending_submission = None
+    if "clear_question_input" not in st.session_state:
+        st.session_state.clear_question_input = False
 
     built, status_payload, status_error = _get_db_status()
 
@@ -61,7 +92,7 @@ def main() -> None:
     st.title("Customer FAQ Assistant")
     sub_col_1, sub_col_2 = st.columns([4, 2])
     with sub_col_1:
-        st.caption("Ask questions about Mockridge Bank products and services.")
+        st.caption("Ask questions about Mockridge Bank's fictional products and services.")
     with sub_col_2:
         status_label = "Ready" if built else "Not Built"
         st.caption(f"DB: {status_label} | docs: {status_payload.get('doc_count', 0)}")
@@ -84,34 +115,40 @@ def main() -> None:
     chat_window = st.container(height=420, border=True)
     with chat_window:
         for msg in st.session_state.chat_messages:
-            with st.chat_message(msg["role"]):
-                st.write(msg["content"])
-                if msg["role"] == "assistant":
-                    retrieval = msg.get("retrieval")
-                    sources = msg.get("sources", [])
-                    if retrieval:
-                        with st.expander("Retrieval Details"):
-                            st.write(retrieval)
-                    if sources:
-                        with st.expander("Sources"):
-                            for source in sources:
-                                st.markdown(f"**{source['title']}** (score: {source['score']})")
-                                st.write(source["snippet"])
+            role = "user" if msg.get("role") == "user" else "assistant"
+            st.markdown(
+                f"<div class='chat-row {role}'><div class='chat-bubble'>{escape(str(msg.get('content', '')))}</div></div>",
+                unsafe_allow_html=True,
+            )
+            if role == "assistant":
+                retrieval = msg.get("retrieval")
+                sources = msg.get("sources", [])
+                if retrieval:
+                    with st.expander("Retrieval Details"):
+                        st.write(retrieval)
+                if sources:
+                    with st.expander("Sources"):
+                        for source in sources:
+                            st.markdown(f"**{source['title']}** (score: {source['score']})")
+                            st.write(source["snippet"])
 
-    controls_disabled = not built
+    controls_disabled = (not built) or (st.session_state.pending_submission is not None)
     examples = [
         "What are your checking account monthly fees?",
         "How do overdraft fees work?",
-        "How do I report an unauthorized transaction?",
+        "What can I do with the mobile app?",
     ]
 
     if st.session_state.pending_example is not None:
         st.session_state.question_input = st.session_state.pending_example
         st.session_state.pending_example = None
+    if st.session_state.clear_question_input:
+        st.session_state.question_input = ""
+        st.session_state.clear_question_input = False
 
     question = st.text_area(
         "Message",
-        placeholder="What are your checking account monthly fees?",
+        placeholder="Enter your question here",
         key="question_input",
         disabled=controls_disabled,
     )
@@ -127,7 +164,8 @@ def main() -> None:
                     "sources": [],
                 }
             ]
-            st.session_state.question_input = ""
+            st.session_state.clear_question_input = True
+            st.session_state.pending_submission = None
             st.rerun()
     with action_col_2:
         button_col_1, button_col_2 = st.columns([3, 1])
@@ -160,31 +198,44 @@ def main() -> None:
             st.warning("Please enter a question before submitting.")
             return
 
-        st.session_state.chat_messages.append({"role": "user", "content": question.strip()})
-        payload = {"question": question, "top_k": top_k, "generator": generator}
+        user_question = question.strip()
+        st.session_state.chat_messages.append({"role": "user", "content": user_question})
+        st.session_state.clear_question_input = True
+        st.session_state.pending_submission = {
+            "question": user_question,
+            "top_k": top_k,
+            "generator": generator,
+        }
+        st.rerun()
 
+    pending_submission = st.session_state.pending_submission
+    if pending_submission is not None:
         try:
-            response = requests.post(f"{API_URL}/ask", json=payload, timeout=90)
-            if response.status_code != 200:
-                detail = response.json().get("detail", "Unknown error")
-                if generator == "distilgpt2" and "setup --with-llm" in detail:
-                    st.warning("LLM assets not installed. Run `python run.py setup --with-llm` first.")
-                if response.status_code == 503 and "Database not built" in detail:
-                    st.warning("Database is not built. Use the Build DB button above.")
-                st.error(f"Request failed ({response.status_code}): {detail}")
-                return
+            with st.spinner("Processing your question..."):
+                response = requests.post(f"{API_URL}/ask", json=pending_submission, timeout=90)
+                if response.status_code != 200:
+                    detail = response.json().get("detail", "Unknown error")
+                    if pending_submission["generator"] == "distilgpt2" and "setup --with-llm" in detail:
+                        st.warning("LLM assets not installed. Run `python run.py setup --with-llm` first.")
+                    if response.status_code == 503 and "Database not built" in detail:
+                        st.warning("Database is not built. Use the Build DB button above.")
+                    st.error(f"Request failed ({response.status_code}): {detail}")
+                    st.session_state.pending_submission = None
+                    return
 
-            body = response.json()
-            st.session_state.chat_messages.append(
-                {
-                    "role": "assistant",
-                    "content": body["answer"],
-                    "retrieval": body.get("retrieval"),
-                    "sources": body.get("sources", []),
-                }
-            )
+                body = response.json()
+                st.session_state.chat_messages.append(
+                    {
+                        "role": "assistant",
+                        "content": body["answer"],
+                        "retrieval": body.get("retrieval"),
+                        "sources": body.get("sources", []),
+                    }
+                )
+            st.session_state.pending_submission = None
             st.rerun()
         except requests.RequestException as exc:
+            st.session_state.pending_submission = None
             st.error(f"Could not reach API at {API_URL}: {exc}")
 
 
