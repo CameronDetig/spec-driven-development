@@ -1,15 +1,16 @@
 # Feature Spec: Retrieval Pipeline
 
 ## Goal
-- Retrieve the most relevant local FAQ documents for a customer question using embeddings and ChromaDB.
+- Retrieve the most relevant local FAQ documents for a customer question using embeddings and local ChromaDB, orchestrated through LangChain.
 
 ## Scope
 - In:
     - Embed incoming question with `all-MiniLM-L6-v2`.
-    - Query local persisted ChromaDB for top-k matches.
+    - Query local persisted ChromaDB for top-k matches (via LangChain vector store integration).
     - Expose DB lifecycle endpoints for build/status.
     - Return scored, sorted source candidates.
     - Apply minimum relevance threshold rule.
+    - Support deterministic lexical fallback if local embedding assets are unavailable.
 - Out:
     - Final answer wording strategy.
     - External document ingestion services.
@@ -21,9 +22,12 @@
     - `GET /db/status` with DB build status and counts.
     - `POST /db/build` to build/index FAQ embeddings.
 - Query flow:
-    - Embed question with `all-MiniLM-L6-v2` via SentenceTransformers.
-    - Query ChromaDB using `top_k`.
+    - Embed question with `all-MiniLM-L6-v2` via LangChain Hugging Face embeddings (SentenceTransformers backend).
+    - Query ChromaDB using `top_k` via LangChain Chroma integration.
     - Map results to source items with `id`, `title`, `snippet`, `score`.
+- If embedding/vector retrieval cannot initialize due to missing local model assets:
+    - System MUST fall back to deterministic lexical retrieval over local FAQ docs.
+    - Response contract and threshold behavior MUST remain unchanged.
 - Sources MUST be sorted by descending relevance score.
 - If no document satisfies relevance threshold:
     - Retrieval result MUST be treated as unmatched.

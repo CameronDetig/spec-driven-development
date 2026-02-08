@@ -22,6 +22,30 @@ MODEL_NAME = "all-MiniLM-L6-v2"
 CHROMA_DIR = Path("chroma")
 COLLECTION_NAME = "mockridge_faq"
 _LEXICAL_FALLBACK_READY = False
+_STOPWORDS = {
+    "a",
+    "an",
+    "and",
+    "are",
+    "can",
+    "do",
+    "for",
+    "how",
+    "i",
+    "in",
+    "is",
+    "it",
+    "my",
+    "of",
+    "on",
+    "or",
+    "the",
+    "to",
+    "what",
+    "with",
+    "you",
+    "your",
+}
 
 
 @dataclass
@@ -63,7 +87,13 @@ def _snippet(body: str, limit: int = 220) -> str:
 
 
 def _tokenize(text: str) -> set[str]:
-    return set(re.findall(r"[a-z0-9]+", text.lower()))
+    raw_tokens = re.findall(r"[a-z0-9]+", text.lower())
+    normalized: set[str] = set()
+    for token in raw_tokens:
+        if len(token) > 3 and token.endswith("s"):
+            normalized.add(token[:-1])
+        normalized.add(token)
+    return normalized
 
 
 def _lexical_search(question: str, docs: list[dict[str, str]], top_k: int, min_score: float) -> list[RetrievedDoc]:
@@ -72,19 +102,37 @@ def _lexical_search(question: str, docs: list[dict[str, str]], top_k: int, min_s
         return []
 
     matches: list[RetrievedDoc] = []
+    key_query_tokens = {token for token in query_tokens if token not in _STOPWORDS}
+    key_query_size = max(1, len(key_query_tokens))
     for doc in docs:
-        corpus_text = f"{doc['title']} {doc['body']}"
-        doc_tokens = _tokenize(corpus_text)
-        if not doc_tokens:
+        title_tokens = _tokenize(doc["title"])
+        body_tokens = _tokenize(doc["body"])
+        doc_tokens = title_tokens | body_tokens
+        if not doc_tokens or not body_tokens:
             continue
 
         overlap = len(query_tokens & doc_tokens)
         if overlap == 0:
             continue
 
-        coverage = overlap / len(query_tokens)
-        density = overlap / max(1, len(doc_tokens))
-        score = min(1.0, (0.85 * coverage) + (0.15 * density * 10))
+        # Prioritize lexical coverage in title to keep obvious intent matches on top
+        # in offline fallback mode (e.g., "checking account" should rank checking docs).
+        title_overlap = len(query_tokens & title_tokens)
+        body_overlap = len(query_tokens & body_tokens)
+        title_coverage = title_overlap / len(query_tokens)
+        body_coverage = body_overlap / len(query_tokens)
+        token_density = overlap / max(1, len(doc_tokens))
+        key_title_overlap = len(key_query_tokens & title_tokens) / key_query_size
+        key_body_overlap = len(key_query_tokens & body_tokens) / key_query_size
+
+        score = min(
+            1.0,
+            (0.42 * body_coverage)
+            + (0.30 * title_coverage)
+            + (0.18 * key_title_overlap)
+            + (0.10 * key_body_overlap)
+            + (0.05 * token_density * 10),
+        )
         if score < min_score:
             continue
 

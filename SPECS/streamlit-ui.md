@@ -22,6 +22,7 @@
 - UI MUST NOT implement authentication, authorization, or user accounts.
 - UI MUST include:
     - Scrollable chat-style message window.
+    - Chat bubble layout with assistant messages left-aligned and user messages right-aligned.
     - Initial assistant welcome message on load.
     - Minimal DB status indicator showing only `built` and `doc_count` from `GET /db/status`.
     - Build DB action button that calls `POST /db/build`.
@@ -32,6 +33,7 @@
     - `Clear Chat` button and `Submit` button positioned directly below message input.
     - `Clear Chat` button visible only after at least one user message exists.
     - Submit action to call API endpoint `POST /ask`.
+    - On submit, UI MUST immediately append the user message to the chat window and clear the input before backend processing completes.
 - On success (`200`), UI MUST display:
     - `answer`
     - `sources` list with `title`, `snippet`, and `score`

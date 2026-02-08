@@ -6,7 +6,7 @@
 ## Scope
 - In:
     - Support `generator=distilgpt2` request option.
-    - Implement a separate generator path backed by Hugging Face `transformers`.
+    - Implement a separate generator path backed by Hugging Face `transformers`, with LangChain pipeline integration when available.
     - Document runtime behavior and first-run model download expectations.
 - Out:
     - CI dependency on LLM mode.
@@ -17,6 +17,7 @@
     - `generator=distilgpt2`
 - Default mode MUST remain `mock`.
 - LLM mode MUST NOT be required to start or test default application workflow.
+- When LangChain Hugging Face integration is available, `distilgpt2` mode SHOULD execute through the LangChain adapter path.
 - If LLM mode is selected and model assets are unavailable:
     - System MUST fail clearly with actionable local setup guidance.
     - UI MUST instruct user to run `python run.py setup --with-llm`.

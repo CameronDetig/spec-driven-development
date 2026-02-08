@@ -10,7 +10,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent
 VENV_DIR = PROJECT_ROOT / ".venv"
 SUPPORTED_MIN = (3, 10)
-SUPPORTED_MAX_EXCLUSIVE = (3, 12)
+SUPPORTED_MAX_EXCLUSIVE = (3, 13)
 
 
 def _venv_python() -> str:
@@ -60,12 +60,12 @@ def _candidate_python_commands() -> list[list[str]]:
     candidates: list[list[str]] = []
     if sys.platform.startswith("win"):
         if shutil.which("py"):
-            candidates.extend([["py", "-3.11"], ["py", "-3.10"]])
+            candidates.extend([["py", "-3.12"], ["py", "-3.11"], ["py", "-3.10"]])
         if shutil.which("python"):
             candidates.append(["python"])
         return candidates
 
-    for command in ["python3.11", "python3.10", "python3", "python"]:
+    for command in ["python3.12", "python3.11", "python3.10", "python3", "python"]:
         if shutil.which(command):
             candidates.append([command])
     return candidates
@@ -81,7 +81,7 @@ def _select_supported_python_command(override: str | None = None) -> list[str] |
         if not _is_supported_version(version):
             print(
                 "Unsupported Python override version: "
-                f"{_version_text(version)}. Supported range is >=3.10 and <3.12."
+                f"{_version_text(version)}. Supported range is >=3.10 and <3.13."
             )
             return None
         return override_cmd
@@ -95,19 +95,33 @@ def _select_supported_python_command(override: str | None = None) -> list[str] |
 
 
 def _attempt_python_install() -> int:
-    print("Attempting to install Python 3.11 with an available package manager...")
+    print("Attempting to install Python 3.12 with an available package manager...")
     installers: list[list[str]] = []
 
     if sys.platform.startswith("win"):
         if shutil.which("winget"):
-            installers.append(["winget", "install", "-e", "--id", "Python.Python.3.11"])
+            installers.append(["winget", "install", "-e", "--id", "Python.Python.3.12"])
         if shutil.which("choco"):
-            installers.append(["choco", "install", "python311", "-y"])
+            installers.append(["choco", "install", "python312", "-y"])
     elif sys.platform == "darwin":
         if shutil.which("brew"):
-            installers.append(["brew", "install", "python@3.11"])
+            installers.append(["brew", "install", "python@3.12"])
     else:
         if shutil.which("apt-get"):
+            installers.append(["apt-get", "update"])
+            installers.append(["apt-get", "install", "-y", "python3.12", "python3.12-venv"])
+        elif shutil.which("dnf"):
+            installers.append(["dnf", "install", "-y", "python3.12"])
+        elif shutil.which("yum"):
+            installers.append(["yum", "install", "-y", "python3.12"])
+
+    # Fallback attempts for package managers that expose only 3.11 packages.
+    if not installers:
+        if sys.platform.startswith("win") and shutil.which("choco"):
+            installers.append(["choco", "install", "python311", "-y"])
+        elif sys.platform == "darwin" and shutil.which("brew"):
+            installers.append(["brew", "install", "python@3.11"])
+        elif shutil.which("apt-get"):
             installers.append(["apt-get", "update"])
             installers.append(["apt-get", "install", "-y", "python3.11", "python3.11-venv"])
         elif shutil.which("dnf"):
@@ -180,8 +194,8 @@ def cmd_setup(args: list[str]) -> int:
         if selected_python is None:
             print(
                 "No supported Python interpreter found for venv creation.\n"
-                "Supported range is >=3.10 and <3.12.\n"
-                "Install Python 3.10 or 3.11, then rerun setup.\n"
+                "Supported range is >=3.10 and <3.13.\n"
+                "Install Python 3.10, 3.11, or 3.12, then rerun setup.\n"
                 "Optional: run 'python run.py setup --install-python' to attempt automated install."
             )
             return 2
@@ -192,7 +206,7 @@ def cmd_setup(args: list[str]) -> int:
             print(
                 "Warning: Current Python "
                 f"{_version_text((current_version[0], current_version[1]))} is outside the recommended range "
-                "(>=3.10 and <3.12). Some dependencies may fail."
+                "(>=3.10 and <3.13). Some dependencies may fail."
             )
         python_bin = sys.executable
 
@@ -237,6 +251,36 @@ def cmd_test(args: list[str]) -> int:
         print("Detected pytest context; skipping nested pytest execution.")
         return 0
     return _run([python_bin, "-m", "pytest", "-q"])
+
+
+def cmd_test_matrix(args: list[str]) -> int:
+    if "--help" in args:
+        print("Usage: python run.py test-matrix [-- <tox args>]")
+        return 0
+
+    python_bin = _venv_python() if VENV_DIR.exists() else sys.executable
+    if os.getenv("PYTEST_CURRENT_TEST"):
+        print("Detected pytest context; skipping nested tox execution.")
+        return 0
+
+    has_tox_in_python = _run(
+        [python_bin, "-c", "import importlib.util, sys; sys.exit(0 if importlib.util.find_spec('tox') else 1)"]
+    ) == 0
+
+    print("Running tox test matrix")
+    if has_tox_in_python:
+        return _run([python_bin, "-m", "tox", *args])
+
+    if shutil.which("tox"):
+        return _run(["tox", *args])
+
+    print(
+        "tox is not installed in the active environment.\n"
+        "Install it with one of:\n"
+        f"  {python_bin} -m pip install tox\n"
+        "  python -m pip install tox"
+    )
+    return 2
 
 
 def cmd_fullstack(args: list[str]) -> int:
@@ -328,6 +372,7 @@ Customer FAQ Assistant - Commands
   python run.py ui                              Start Streamlit UI
   python run.py fullstack                       Start API + UI together
   python run.py test                            Run pytest
+  python run.py test-matrix                     Run tox matrix (py310/py311/py312)
   python run.py help                            Show this help
 
 Optional Docker helpers:
@@ -355,6 +400,7 @@ def main() -> int:
         "ui": cmd_ui,
         "fullstack": cmd_fullstack,
         "test": cmd_test,
+        "test-matrix": cmd_test_matrix,
         "help": lambda _args: show_help(),
         "docker-build": cmd_docker_build,
         "docker-api": cmd_docker_api,
