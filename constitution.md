@@ -1,7 +1,7 @@
 # Project Constitution — Customer FAQ Assistant (Mockridge Bank)
 
 ## 1) Purpose and Scope
-This constitution defines non-negotiable engineering intent for this repository.
+This constitution defines the engineering intent for this repository.
 It is the decision baseline for humans and AI contributors.
 
 Source of truth order:

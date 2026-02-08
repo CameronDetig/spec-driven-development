@@ -48,6 +48,10 @@ _STOPWORDS = {
 }
 
 
+def _report_build_status(message: str) -> None:
+    print(f"[db-build] {message}", flush=True)
+
+
 @dataclass
 class RetrievedDoc:
     id: str
@@ -291,10 +295,13 @@ def get_db_status() -> dict:
 def build_db() -> dict:
     global _LEXICAL_FALLBACK_READY
 
+    _report_build_status("Loading FAQ documents")
     docs = load_faq_docs()
+    _report_build_status(f"Loaded {len(docs)} documents")
     client = _get_client()
 
     # Full rebuild avoids stale embeddings when FAQ text changes but IDs stay the same.
+    _report_build_status("Resetting existing collection")
     try:
         client.delete_collection(COLLECTION_NAME)
     except Exception:
@@ -304,9 +311,11 @@ def build_db() -> dict:
     _get_langchain_vectorstore.cache_clear()
 
     try:
+        _report_build_status("Initializing collection")
         collection = _get_collection()
         if docs:
             if _use_langchain_retrieval():
+                _report_build_status("Indexing with LangChain Chroma embeddings")
                 vectorstore = _get_langchain_vectorstore()
                 vectorstore.add_texts(
                     texts=[doc["body"] for doc in docs],
@@ -314,6 +323,7 @@ def build_db() -> dict:
                     metadatas=[{"title": doc["title"], "id": doc["id"]} for doc in docs],
                 )
             else:
+                _report_build_status("Indexing with SentenceTransformer embeddings")
                 model = _get_legacy_model()
                 texts = [f"{doc['title']}\n{doc['body']}" for doc in docs]
                 embeddings = model.encode(texts, normalize_embeddings=True).tolist()
@@ -327,6 +337,7 @@ def build_db() -> dict:
         after = collection.count()
         built = after == len(docs) and len(docs) > 0
         _LEXICAL_FALLBACK_READY = False
+        _report_build_status(f"Completed: indexed={after}, built={built}")
         return {
             "built": built,
             "doc_count": len(docs),
@@ -337,6 +348,9 @@ def build_db() -> dict:
     except Exception:
         # Offline-safe fallback for environments without local embedding assets.
         _LEXICAL_FALLBACK_READY = len(docs) > 0
+        _report_build_status(
+            "Embedding index unavailable; using deterministic lexical fallback mode"
+        )
         return {
             "built": _LEXICAL_FALLBACK_READY,
             "doc_count": len(docs),

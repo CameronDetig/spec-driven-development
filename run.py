@@ -167,6 +167,21 @@ def _download_llm_assets(python_bin: str) -> int:
     )
 
 
+def _build_retrieval_db(python_bin: str) -> int:
+    print("Building retrieval database...")
+    return _run(
+        [
+            python_bin,
+            "-c",
+            (
+                "import json; "
+                "from app.retrieval import build_db; "
+                "print(json.dumps(build_db()))"
+            ),
+        ]
+    )
+
+
 def cmd_setup(args: list[str]) -> int:
     if "--help" in args:
         print("Usage: python run.py setup [--no-venv] [--with-llm] [--python <path-or-command>] [--install-python]")
@@ -213,6 +228,11 @@ def cmd_setup(args: list[str]) -> int:
     print("Installing dependencies from requirements.txt")
     result = _run([python_bin, "-m", "pip", "install", "-r", "requirements.txt"])
     if result != 0:
+        return result
+
+    result = _build_retrieval_db(python_bin)
+    if result != 0:
+        print("Failed to build retrieval database during setup.")
         return result
 
     if "--with-llm" in args:
