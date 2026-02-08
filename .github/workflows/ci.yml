@@ -20,6 +20,8 @@ jobs:
     name: Tests (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    env:
+      PIP_EXTRA_INDEX_URL: https://download.pytorch.org/whl/cpu
     strategy:
       fail-fast: false
       matrix:
