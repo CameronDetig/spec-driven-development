@@ -18,6 +18,9 @@
     - `id`
     - `title`
     - `body`
+- For markdown documents, required fields MUST be explicitly present as:
+    - `id: <value>`
+    - `title: <value>`
 - Corpus MUST represent core Mockridge Bank topics, including:
     - checking accounts
     - savings accounts

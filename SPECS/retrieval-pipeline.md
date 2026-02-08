@@ -24,6 +24,9 @@
 - If no document satisfies relevance threshold:
     - Retrieval result MUST be treated as unmatched.
     - Downstream response MUST use fallback behavior.
+- Relevance threshold MUST be configurable via environment variable:
+    - `RAG_MIN_SCORE`
+    - Default value: `0.25`
 - Retrieval metadata MUST include:
     - `top_k` as the effective query size.
     - `matched` as number of documents included in `sources`.

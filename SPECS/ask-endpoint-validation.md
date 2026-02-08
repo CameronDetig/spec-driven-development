@@ -25,6 +25,7 @@
     - `top_k` below 1.
     - `top_k` above 5.
 - Error responses MUST be JSON and machine-parseable.
+- Error responses MUST include a top-level `detail` field suitable for user-facing validation feedback.
 - Validation MUST run before retrieval or generation logic executes.
 
 ## Acceptance Criteria

@@ -16,12 +16,12 @@
     - `answer`
     - `sources`
     - `retrieval`
-- `answer` MUST be a string.
+- `answer` MUST be a non-empty string.
 - `sources` MUST be an array (possibly empty).
 - Each `sources` item MUST include:
-    - `id` (string)
-    - `title` (string)
-    - `snippet` (string)
+    - `id` (non-empty string)
+    - `title` (non-empty string)
+    - `snippet` (non-empty string)
     - `score` (number)
 - `retrieval` MUST include:
     - `top_k` (integer)
@@ -36,5 +36,6 @@
 ## Acceptance Criteria
 - [ ] Contract test validates required top-level keys exist on every 200 response.
 - [ ] Contract test validates source item field presence and scalar types.
+- [ ] Contract test validates `answer`, `id`, `title`, and `snippet` are non-empty strings.
 - [ ] Fallback path preserves full schema and uses empty `sources`.
 - [ ] Retrieval metadata fields are always present and consistent with payload.
