@@ -23,8 +23,13 @@
     - `sources` MUST be empty in API response.
 - Generator interface MUST be cleanly swappable with optional LLM generator.
 
+## Related Specifications
+- `generation-optional-llm.md` - Alternative LLM-based generator (opt-in)
+- `retrieval-pipeline.md` - Provides source documents for answer generation
+- `ask-response-contract.md` - Defines answer field in response schema
+
 ## Acceptance Criteria
-- [ ] Tests run fully with `RAG_GENERATOR=mock` and no model downloads.
-- [ ] Repeated identical requests produce identical answers.
-- [ ] Matched retrieval path returns a non-empty answer derived from source content.
-- [ ] Unmatched retrieval path returns fallback answer and empty sources.
+- [x] Tests run fully with `RAG_GENERATOR=mock` and no model downloads. (conftest.py::default_generator_env)
+- [x] Repeated identical requests produce identical answers. (test_determinism.py::test_same_input_produces_same_output)
+- [x] Matched retrieval path returns a non-empty answer derived from source content. (test_contract.py::test_ask_response_contract_contains_required_top_level_keys)
+- [x] Unmatched retrieval path returns fallback answer and empty sources. (test_retrieval.py::test_unknown_query_returns_fallback_with_empty_sources)

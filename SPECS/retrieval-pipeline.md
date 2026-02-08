@@ -32,9 +32,14 @@
     - `matched` as number of documents included in `sources`.
 - Retrieval behavior MUST be deterministic for the same corpus and input.
 
+## Related Specifications
+- `faq-data.md` - Defines corpus structure that retrieval depends on
+- `ask-endpoint-validation.md` - Validates request before retrieval
+- `generation-mock.md` - Consumes retrieval results to generate answers
+
 ## Acceptance Criteria
-- [ ] A known banking query retrieves an expected FAQ document as top result.
-- [ ] Changing `top_k` changes the maximum returned source count accordingly.
-- [ ] Source list is sorted by score descending.
-- [ ] Unknown/out-of-domain query triggers unmatched retrieval path.
-- [ ] Retrieval metadata reports `top_k` and `matched` accurately.
+- [x] A known banking query retrieves an expected FAQ document as top result. (test_retrieval.py::test_known_query_returns_expected_top_document)
+- [x] Changing `top_k` changes the maximum returned source count accordingly. (test_retrieval.py::test_top_k_controls_maximum_number_of_sources)
+- [x] Source list is sorted by score descending. (test_retrieval.py::test_sources_are_sorted_by_descending_score)
+- [x] Unknown/out-of-domain query triggers unmatched retrieval path. (test_retrieval.py::test_unknown_query_returns_fallback_with_empty_sources)
+- [x] Retrieval metadata reports `top_k` and `matched` accurately. (test_contract.py::test_ask_response_retrieval_metadata_has_required_fields)

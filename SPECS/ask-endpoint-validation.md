@@ -28,10 +28,14 @@
 - Error responses MUST include a top-level `detail` field suitable for user-facing validation feedback.
 - Validation MUST run before retrieval or generation logic executes.
 
+## Related Specifications
+- `ask-response-contract.md` - Defines success response schema for valid requests
+- `retrieval-pipeline.md` - Processes validated requests
+
 ## Acceptance Criteria
-- [ ] Missing `question` returns `400`.
-- [ ] `question` shorter than 5 characters returns `400`.
-- [ ] `question` longer than 300 characters returns `400`.
-- [ ] `top_k = 0` returns `400`.
-- [ ] `top_k > 5` returns `400`.
-- [ ] Omitted `top_k` is accepted and treated as `3`.
+- [x] Missing `question` returns `400`. (test_validation.py::test_ask_missing_question_returns_400)
+- [x] `question` shorter than 5 characters returns `400`. (test_validation.py::test_ask_question_too_short_returns_400)
+- [x] `question` longer than 300 characters returns `400`. (test_validation.py::test_ask_question_too_long_returns_400)
+- [x] `top_k = 0` returns `400`. (test_validation.py::test_ask_top_k_zero_returns_400)
+- [x] `top_k > 5` returns `400`. (test_validation.py::test_ask_top_k_above_range_returns_400)
+- [x] Omitted `top_k` is accepted and treated as `3`. (test_validation.py::test_ask_omitted_top_k_uses_default)

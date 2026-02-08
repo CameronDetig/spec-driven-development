@@ -1,4 +1,4 @@
-# Project Brief — Spec-Driven RAG FAQ API (Mockridge Bank)
+# Project Brief — Customer FAQ Assistant (Mockridge Bank)
 
 ## Purpose of This File
 
@@ -17,7 +17,7 @@ Note: Per project rules, do not use `README.md` as context for the LLM/tool.
 
 ## Project Overview
 
-Build a spec-driven, testable RAG-style Customer FAQ Answering API
+Build a spec-driven, testable RAG-style Customer FAQ Assistant
 for a fictional bank named "Mockridge Bank".
 
 The system:
@@ -141,6 +141,7 @@ Coverage is defined by the specs in `SPECS/` and implemented in `tests/`.
 - `app/models.py` Pydantic schemas
 - `app/retrieval.py` ChromaDB + embeddings
 - `app/generation.py` mock + optional LLM generator
+- `run.py` cross-platform entry point for setup, run, and test commands
 - `data/faq/*` local FAQ corpus
 - `ui/streamlit_app.py` single-page Streamlit UI
 - `tests/` pytest suite

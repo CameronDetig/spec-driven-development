@@ -17,7 +17,10 @@
 - Response content type MUST be JSON.
 - Endpoint behavior MUST be deterministic and independent of retrieval/generation subsystems.
 
+## Related Specifications
+- None - Health endpoint is independent of other features
+
 ## Acceptance Criteria
-- [ ] Calling `GET /health` returns status code `200`.
-- [ ] Response JSON includes key `status` with value `ok`.
-- [ ] No API keys, external services, or model downloads are required.
+- [x] Calling `GET /health` returns status code `200`. (test_health.py::test_health_returns_ok)
+- [x] Response JSON includes key `status` with value `ok`. (test_health.py::test_health_returns_ok)
+- [x] No API keys, external services, or model downloads are required. (test_health.py::test_health_returns_ok)

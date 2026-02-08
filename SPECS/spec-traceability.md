@@ -17,9 +17,9 @@
 - Traceability document MUST be updated when adding/changing feature specs.
 
 ## Acceptance Criteria
-- [ ] Matrix includes each current spec file in `SPECS/`.
-- [ ] Matrix lists at least one test target per spec.
-- [ ] Matrix lists at least one implementation target per spec.
+- [x] Matrix includes each current spec file in `SPECS/`.
+- [x] Matrix lists at least one test target per spec.
+- [x] Matrix lists at least one implementation target per spec.
 
 ## Mapping
 - `SPECS/health-endpoint.md`
@@ -32,7 +32,7 @@
     - Tests: `tests/test_retrieval.py`
     - Implementation: `app/retrieval.py`
 - `SPECS/generation-mock.md`
-    - Tests: `tests/test_retrieval.py`, `tests/test_contract.py`
+    - Tests: `tests/test_determinism.py`, `tests/test_retrieval.py`, `tests/test_contract.py`
     - Implementation: `app/generation.py`
 - `SPECS/generation-optional-llm.md`
     - Tests: `tests/test_generator_config.py` (optional/non-blocking), existing suite in mock mode
@@ -46,3 +46,6 @@
 - `SPECS/streamlit-ui.md`
     - Tests: `tests/test_streamlit_smoke.py` (optional smoke), manual acceptance checks
     - Implementation: `ui/streamlit_app.py`
+- `SPECS/entrypoint-cli.md`
+    - Tests: `tests/test_cli.py`, manual acceptance checks
+    - Implementation: `run.py`

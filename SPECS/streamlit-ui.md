@@ -1,12 +1,12 @@
-# Feature Spec: Streamlit UI
+# Feature Spec: Customer FAQ Assistant UI (Streamlit)
 
 ## Goal
-- Provide a simple local UI to interact with the RAG FAQ API for manual testing and demonstration.
+- Provide a simple local UI to interact with the Customer FAQ Assistant for manual testing and demonstration.
 
 ## Scope
 - In:
-    - A single-page Streamlit application.
-    - A Streamlit app with question input and `top_k` control.
+    - Single-page Streamlit application.
+    - Question input and `top_k` control.
     - Submit workflow that calls `POST /ask`.
     - Rendering of answer, sources, and retrieval metadata.
     - User-visible handling for API validation and runtime errors.
@@ -33,12 +33,17 @@
 - UI MUST not require optional LLM mode; default mock mode must be fully supported.
 - UI MUST not embed secrets or credentials in code.
 
+## Related Specifications
+- `ask-endpoint-validation.md` - Defines validation rules that UI must handle
+- `ask-response-contract.md` - Defines response schema that UI must render
+- `generation-mock.md` - Default generator that UI relies on
+
 ## Acceptance Criteria
-- [ ] User can enter a valid question, submit, and view answer output.
-- [ ] User can change `top_k` and see reflected retrieval metadata.
-- [ ] Source citations are rendered when present.
-- [ ] Fallback path is visible and understandable when no matches exist.
-- [ ] Validation errors are shown in the UI without app crash.
-- [ ] UI runs locally against the API in default mock mode.
-- [ ] UI is implemented as a single page.
-- [ ] UI is accessible without authentication or account flows.
+- [ ] User can enter a valid question, submit, and view answer output. (manual acceptance)
+- [ ] User can change `top_k` and see reflected retrieval metadata. (manual acceptance)
+- [ ] Source citations are rendered when present. (manual acceptance)
+- [ ] Fallback path is visible and understandable when no matches exist. (manual acceptance)
+- [ ] Validation errors are shown in the UI without app crash. (manual acceptance)
+- [x] UI runs locally against the API in default mock mode. (test_streamlit_smoke.py::test_streamlit_app_module_imports)
+- [ ] UI is implemented as a single page. (manual acceptance)
+- [ ] UI is accessible without authentication or account flows. (manual acceptance)
