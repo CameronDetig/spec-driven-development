@@ -48,6 +48,7 @@ class DistilGPT2Generator:
                 do_sample=False,
                 num_return_sequences=1,
                 pad_token_id=50256,
+                eos_token_id=50256,
                 return_full_text=False,
             )
             if _use_langchain_generation():
@@ -74,13 +75,62 @@ class DistilGPT2Generator:
             )
             for source in sources[:3]
         ]
-        return str(generate_rag_answer(question=question, documents=documents, llm=self._llm)).strip()
+        raw_text = str(generate_rag_answer(question=question, documents=documents, llm=self._llm)).strip()
+        
+        # Clean up common repetition patterns from distilgpt2
+        if raw_text:
+            # Split on newlines and take only the first substantial line
+            first_line = raw_text.split('\n')[0].strip()
+            # Remove repeated "Answer:" patterns
+            while "Answer:" in first_line:
+                first_line = first_line.replace("Answer:", "").strip()
+            
+            # Quality check: distilgpt2 often produces garbage output
+            if self._is_low_quality_output(first_line):
+                return ""
+            
+            return first_line
+        return ""
+
+    def _is_low_quality_output(self, text: str) -> bool:
+        """Detect when distilgpt2 produces nonsensical output."""
+        if not text or len(text) < 10:
+            return True
+        
+        # Check if output is mostly punctuation or special characters
+        alpha_chars = sum(c.isalpha() for c in text)
+        if alpha_chars < len(text) * 0.5:  # Less than 50% letters
+            return True
+        
+        # Check for repetitive patterns (same word repeated 3+ times)
+        words = text.lower().split()
+        if len(words) > 2:
+            for i in range(len(words) - 2):
+                if words[i] == words[i + 1] == words[i + 2]:
+                    return True
+        
+        return False
 
     def _generate_legacy(self, question: str, sources: list[dict]) -> str:
         context = " ".join(source.get("snippet", "") for source in sources[:2])
-        prompt = f"Question: {question}\nContext: {context}\nAnswer:"
+        prompt = f"Question: {question}\nContext: {context}\nAnswer: "
         outputs = self._generator(prompt)
-        return str(outputs[0].get("generated_text", "")).strip() if outputs else ""
+        raw_text = str(outputs[0].get("generated_text", "")).strip() if outputs else ""
+        
+        # Clean up common repetition patterns from distilgpt2
+        if raw_text:
+            # Split on newlines and take only the first sentence/line
+            first_line = raw_text.split('\n')[0].strip()
+            # Remove repeated "Answer:" patterns
+            while "Answer:" in first_line:
+                first_line = first_line.replace("Answer:", "").strip()
+            
+            # Quality check: distilgpt2 often produces garbage output
+            if self._is_low_quality_output(first_line):
+                return ""
+            
+            return first_line
+        return ""
 
     def generate(self, question: str, sources: list[dict]) -> str:
         self._ensure_model()
@@ -94,7 +144,13 @@ class DistilGPT2Generator:
             else self._generate_legacy(question=question, sources=sources)
         )
         if not text:
-            return FALLBACK_ANSWER
+            # distilgpt2 often produces low-quality output; fall back with explanation
+            titles = ", ".join(source["title"] for source in sources[:2])
+            return (
+                f"Based on Mockridge Bank FAQ ({titles}), see sources below. "
+                f"(Note: distilgpt2 generation was unreliable for this query. "
+                f"Try 'mock' generator for consistent results.)"
+            )
         return text
 
 

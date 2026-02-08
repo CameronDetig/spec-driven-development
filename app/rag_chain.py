@@ -10,7 +10,7 @@ RAG_PROMPT = PromptTemplate.from_template(
         "If the context is insufficient, say so briefly.\n\n"
         "Question: {question}\n"
         "Context:\n{context}\n\n"
-        "Answer:"
+        "Answer: "
     )
 )
 

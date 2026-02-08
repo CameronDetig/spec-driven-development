@@ -224,8 +224,8 @@ def _get_langchain_vectorstore() -> Any:
     from langchain_chroma import Chroma
 
     return Chroma(
+        client=_get_client(),
         collection_name=COLLECTION_NAME,
-        persist_directory=str(CHROMA_DIR),
         embedding_function=_get_langchain_embeddings(),
         collection_metadata={"hnsw:space": "cosine"},
     )
@@ -298,15 +298,13 @@ def build_db() -> dict:
     _report_build_status("Loading FAQ documents")
     docs = load_faq_docs()
     _report_build_status(f"Loaded {len(docs)} documents")
-    client = _get_client()
 
-    # Full rebuild avoids stale embeddings when FAQ text changes but IDs stay the same.
+    # Full rebuild: reset the database to remove all collections and stale
+    # index files, then recreate from scratch.  allow_reset=True is set
+    # in the client settings to permit this.
     _report_build_status("Resetting existing collection")
-    try:
-        client.delete_collection(COLLECTION_NAME)
-    except Exception:
-        pass
-
+    client = _get_client()
+    client.reset()
     _get_collection.cache_clear()
     _get_langchain_vectorstore.cache_clear()
 

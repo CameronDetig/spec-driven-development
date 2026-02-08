@@ -123,14 +123,16 @@ def main() -> None:
             if role == "assistant":
                 retrieval = msg.get("retrieval")
                 sources = msg.get("sources", [])
-                if retrieval:
-                    with st.expander("Retrieval Details"):
-                        st.write(retrieval)
-                if sources:
+                if sources or retrieval:
                     with st.expander("Sources"):
-                        for source in sources:
-                            st.markdown(f"**{source['title']}** (score: {source['score']})")
-                            st.write(source["snippet"])
+                        if sources:
+                            for source in sources:
+                                st.markdown(f"**{source['title']}** (score: {source['score']})")
+                                st.write(source["snippet"])
+                        if retrieval:
+                            st.divider()
+                            st.caption("Retrieval Details")
+                            st.write(retrieval)
 
     controls_disabled = (not built) or (st.session_state.pending_submission is not None)
     examples = [
@@ -174,6 +176,9 @@ def main() -> None:
         with button_col_2:
             submit_clicked = st.button("Submit", key="submit_btn", disabled=controls_disabled)
 
+    # Processing status placeholder appears between submit buttons and examples
+    processing_placeholder = st.empty()
+
     st.caption("Try an example:")
     chip_cols = st.columns(3)
     for idx, example in enumerate(examples):
@@ -190,7 +195,7 @@ def main() -> None:
             ["mock", "distilgpt2"],
             index=0,
             disabled=controls_disabled,
-            help="Mock is deterministic, intended for testing. distilgpt2 is an actual LLM that first needs to be installed via 'run.py setup --with-llm'",
+            help="Mock is deterministic and reliable (recommended). distilgpt2 is a small experimental LLM that often produces low-quality or nonsensical answers. Install via 'run.py setup --with-llm'",
         )
 
     if submit_clicked:
@@ -211,27 +216,28 @@ def main() -> None:
     pending_submission = st.session_state.pending_submission
     if pending_submission is not None:
         try:
-            with st.spinner("Processing your question..."):
-                response = requests.post(f"{API_URL}/ask", json=pending_submission, timeout=90)
-                if response.status_code != 200:
-                    detail = response.json().get("detail", "Unknown error")
-                    if pending_submission["generator"] == "distilgpt2" and "setup --with-llm" in detail:
-                        st.warning("LLM assets not installed. Run `python run.py setup --with-llm` first.")
-                    if response.status_code == 503 and "Database not built" in detail:
-                        st.warning("Database is not built. Use the Build DB button above.")
-                    st.error(f"Request failed ({response.status_code}): {detail}")
-                    st.session_state.pending_submission = None
-                    return
+            with processing_placeholder.container():
+                with st.spinner("Processing your question..."):
+                    response = requests.post(f"{API_URL}/ask", json=pending_submission, timeout=90)
+                    if response.status_code != 200:
+                        detail = response.json().get("detail", "Unknown error")
+                        if pending_submission["generator"] == "distilgpt2" and "setup --with-llm" in detail:
+                            st.warning("LLM assets not installed. Run `python run.py setup --with-llm` first.")
+                        if response.status_code == 503 and "Database not built" in detail:
+                            st.warning("Database is not built. Use the Build DB button above.")
+                        st.error(f"Request failed ({response.status_code}): {detail}")
+                        st.session_state.pending_submission = None
+                        return
 
-                body = response.json()
-                st.session_state.chat_messages.append(
-                    {
-                        "role": "assistant",
-                        "content": body["answer"],
-                        "retrieval": body.get("retrieval"),
-                        "sources": body.get("sources", []),
-                    }
-                )
+                    body = response.json()
+                    st.session_state.chat_messages.append(
+                        {
+                            "role": "assistant",
+                            "content": body["answer"],
+                            "retrieval": body.get("retrieval"),
+                            "sources": body.get("sources", []),
+                        }
+                    )
             st.session_state.pending_submission = None
             st.rerun()
         except requests.RequestException as exc:

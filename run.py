@@ -19,8 +19,8 @@ def _venv_python() -> str:
     return str(VENV_DIR / "bin" / "python")
 
 
-def _run(cmd: list[str], cwd: Path | None = None, check: bool = False) -> int:
-    proc = subprocess.run(cmd, cwd=cwd or PROJECT_ROOT)
+def _run(cmd: list[str], cwd: Path | None = None, check: bool = False, env: dict | None = None) -> int:
+    proc = subprocess.run(cmd, cwd=cwd or PROJECT_ROOT, env=env)
     if check and proc.returncode != 0:
         raise SystemExit(proc.returncode)
     return proc.returncode
@@ -153,17 +153,71 @@ def _has_docker() -> bool:
     return shutil.which("docker") is not None
 
 
-def _download_llm_assets(python_bin: str) -> int:
-    print("Downloading distilgpt2 model assets...")
+def _download_embedding_model(python_bin: str) -> int:
+    print("Downloading embedding model (all-MiniLM-L6-v2)...")
+    
+    # Suppress harmless HuggingFace warnings (symlink cache on Windows, hf_xet).
+    hf_env = {**os.environ, "HF_HUB_DISABLE_SYMLINKS_WARNING": "1"}
+    
+    # First, download with network access
+    result = _run(
+        [
+            python_bin,
+            "-c",
+            (
+                "import warnings; warnings.filterwarnings('ignore'); "
+                "from langchain_huggingface import HuggingFaceEmbeddings; "
+                "print('Downloading model...'); "
+                "embeddings = HuggingFaceEmbeddings("
+                "model_name='sentence-transformers/all-MiniLM-L6-v2', "
+                "model_kwargs={'local_files_only': False}"
+                "); "
+                "embeddings.embed_query('test'); "
+                "print('Download complete')"
+            ),
+        ],
+        env=hf_env,
+    )
+    
+    if result != 0:
+        return result
+    
+    # Verify it can be loaded with local_files_only=True (same as retrieval code)
+    print("Verifying model is cached for offline use...")
     return _run(
         [
             python_bin,
             "-c",
             (
+                "import warnings; warnings.filterwarnings('ignore'); "
+                "from langchain_huggingface import HuggingFaceEmbeddings; "
+                "embeddings = HuggingFaceEmbeddings("
+                "model_name='sentence-transformers/all-MiniLM-L6-v2', "
+                "model_kwargs={'local_files_only': True}, "
+                "encode_kwargs={'normalize_embeddings': True}"
+                "); "
+                "embeddings.embed_query('verification test'); "
+                "print('Embedding model verified and ready for offline use')"
+            ),
+        ],
+        env=hf_env,
+    )
+
+
+def _download_llm_assets(python_bin: str) -> int:
+    print("Downloading distilgpt2 model assets...")
+    hf_env = {**os.environ, "HF_HUB_DISABLE_SYMLINKS_WARNING": "1"}
+    return _run(
+        [
+            python_bin,
+            "-c",
+            (
+                "import warnings; warnings.filterwarnings('ignore'); "
                 "from transformers import pipeline; "
                 "pipeline('text-generation', model='distilgpt2', tokenizer='distilgpt2')"
             ),
-        ]
+        ],
+        env=hf_env,
     )
 
 
@@ -228,6 +282,11 @@ def cmd_setup(args: list[str]) -> int:
     print("Installing dependencies from requirements.txt")
     result = _run([python_bin, "-m", "pip", "install", "-r", "requirements.txt"])
     if result != 0:
+        return result
+
+    result = _download_embedding_model(python_bin)
+    if result != 0:
+        print("Failed to download embedding model during setup.")
         return result
 
     result = _build_retrieval_db(python_bin)
