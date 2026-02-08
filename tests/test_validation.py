@@ -275,7 +275,7 @@ def test_ask_generator_invalid_returns_400(client):
     Verify that POST /ask returns 400 when generator is not an allowed value.
     
     Spec: ask-endpoint-validation.md
-    Requirement: "`generator` is optional string with allowed values `mock` or `distilgpt2`"
+    Requirement: "`generator` is optional string with allowed values `mock` or `flan-t5`"
     """
     payload = {"question": "What are your overdraft fees?", "top_k": 3, "generator": "gpt4"}
     response = client.post("/ask", json=payload)

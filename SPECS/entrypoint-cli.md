@@ -46,7 +46,7 @@
 ## Acceptance Criteria
 - [ ] `python run.py help` prints usage and available commands. (test_cli.py - to be implemented)
 - [ ] `python run.py setup` installs dependencies without requiring manual venv steps. (manual acceptance)
-- [ ] `python run.py setup --with-llm` downloads LLM assets for distilgpt2. (manual acceptance)
+- [ ] `python run.py setup --with-llm` downloads LLM assets for flan-t5. (manual acceptance)
 - [ ] `python run.py setup --no-venv` installs dependencies into the current environment. (manual acceptance)
 - [ ] `python run.py setup` automatically selects a supported interpreter (`3.12`/`3.11`/`3.10`) for `.venv` creation when available. (manual acceptance)
 - [ ] `python run.py setup --python <interpreter>` uses the specified interpreter when supported. (manual acceptance)

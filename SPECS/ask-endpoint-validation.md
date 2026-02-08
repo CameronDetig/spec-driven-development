@@ -17,7 +17,7 @@
 - Request schema:
     - `question` is required string with length `5..300`.
     - `top_k` is optional integer with default `3` and valid range `1..5`.
-    - `generator` is optional string with allowed values `mock` or `distilgpt2`.
+    - `generator` is optional string with allowed values `mock` or `flan-t5`.
 - Validation failures MUST return HTTP 400.
 - Validation failures include:
     - Missing `question`.

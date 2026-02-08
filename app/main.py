@@ -53,8 +53,8 @@ def _validate_generator(payload: dict) -> str:
     if not isinstance(value, str):
         raise _bad_request("generator must be a string")
     choice = value.strip().lower()
-    if choice not in {"mock", "distilgpt2"}:
-        raise _bad_request("generator must be mock or distilgpt2")
+    if choice not in {"mock", "flan-t5"}:
+        raise _bad_request("generator must be mock or flan-t5")
     return choice
 
 
@@ -88,7 +88,7 @@ def ask(payload: dict = Body(...)):
         generator = get_generator(generator_mode)
         answer = generator.generate(question=question, sources=sources)
     except RuntimeError as exc:
-        # Distilgpt2 path may fail when model assets are not installed locally.
+        # LLM generator may fail when model assets are not installed locally.
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
     response = {

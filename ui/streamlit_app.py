@@ -192,10 +192,10 @@ def main() -> None:
     with control_col_2:
         generator = st.selectbox(
             "Response generator type",
-            ["mock", "distilgpt2"],
+            ["mock", "flan-t5"],
             index=0,
             disabled=controls_disabled,
-            help="Mock is deterministic and reliable (recommended). distilgpt2 is a small experimental LLM that often produces low-quality or nonsensical answers. Install via 'run.py setup --with-llm'",
+            help="Mock is deterministic and reliable (recommended). flan-t5 is a small instruction-tuned LLM (80M params) for experimental local generation. Install via 'run.py setup --with-llm'",
         )
 
     if submit_clicked:
@@ -221,7 +221,7 @@ def main() -> None:
                     response = requests.post(f"{API_URL}/ask", json=pending_submission, timeout=90)
                     if response.status_code != 200:
                         detail = response.json().get("detail", "Unknown error")
-                        if pending_submission["generator"] == "distilgpt2" and "setup --with-llm" in detail:
+                        if pending_submission["generator"] == "flan-t5" and "setup --with-llm" in detail:
                             st.warning("LLM assets not installed. Run `python run.py setup --with-llm` first.")
                         if response.status_code == 503 and "Database not built" in detail:
                             st.warning("Database is not built. Use the Build DB button above.")

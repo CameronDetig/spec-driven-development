@@ -10,7 +10,7 @@ Spec-driven local RAG assistant built with FastAPI + Streamlit.
 - Retrieves relevant local FAQ documents from ChromaDB
 - Generates answers with:
   - deterministic `mock` mode (default, test-friendly)
-  - optional `distilgpt2` mode
+  - optional `flan-t5` mode (small instruction-tuned LLM)
 - Returns answer + cited sources + retrieval metadata
 
 ## Tech Stack
@@ -130,4 +130,4 @@ Example request:
 
 ## Notes
 - Default mode is deterministic and intended for local testing/CI.
-- Optional `distilgpt2` mode is for local experimentation and may require model assets.
+- Optional `flan-t5` mode uses Google's Flan-T5-small (80M params) for local experimentation and requires model assets (~308MB download via `python run.py setup --with-llm`).

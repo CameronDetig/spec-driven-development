@@ -5,12 +5,10 @@ from langchain_core.prompts import PromptTemplate
 
 RAG_PROMPT = PromptTemplate.from_template(
     (
-        "You are answering customer support FAQ questions for Mockridge Bank.\n"
-        "Use only the provided context.\n"
-        "If the context is insufficient, say so briefly.\n\n"
-        "Question: {question}\n"
+        "Answer the customer's question about Mockridge Bank using only the provided context.\n\n"
         "Context:\n{context}\n\n"
-        "Answer: "
+        "Question: {question}\n\n"
+        "Answer:"
     )
 )
 

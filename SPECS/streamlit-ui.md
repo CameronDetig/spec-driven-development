@@ -28,7 +28,7 @@
     - Build DB action button that calls `POST /db/build`.
     - Question text input.
     - `top_k` control constrained to `1..5` with default `3`, displayed inline with generator selection.
-    - Generator selector with `mock` (default) and `distilgpt2` options, displayed inline with `top_k`.
+    - Generator selector with `mock` (default) and `flan-t5` options, displayed inline with `top_k`.
     - Three clickable example query buttons below the message input.
     - `Clear Chat` button and `Submit` button positioned directly below message input.
     - `Clear Chat` button visible only after at least one user message exists.
@@ -41,7 +41,7 @@
 - On fallback responses (`sources=[]`), UI MUST clearly indicate no matching sources were found.
 - On API validation errors (`400`), UI MUST show clear, non-crashing feedback to user.
 - If DB status is not built, question input and submit controls MUST be disabled until build succeeds.
-- If `distilgpt2` is selected and model assets are missing, UI MUST instruct the user to run `python run.py setup --with-llm`.
+- If `flan-t5` is selected and model assets are missing, UI MUST instruct the user to run `python run.py setup --with-llm`.
 - UI MUST not require optional LLM mode; default mock mode must be fully supported.
 - UI MUST not embed secrets or credentials in code.
 
@@ -53,7 +53,7 @@
 ## Acceptance Criteria
 - [ ] User can enter a valid question, submit, and view answer output. (manual acceptance)
 - [ ] User can change `top_k` and see reflected retrieval metadata. (manual acceptance)
-- [ ] User can switch generator between `mock` and `distilgpt2` from the same control row as `top_k`. (manual acceptance)
+- [ ] User can switch generator between `mock` and `flan-t5` from the same control row as `top_k`. (manual acceptance)
 - [ ] Source citations are rendered when present. (manual acceptance)
 - [ ] Fallback path is visible and understandable when no matches exist. (manual acceptance)
 - [ ] Validation errors are shown in the UI without app crash. (manual acceptance)

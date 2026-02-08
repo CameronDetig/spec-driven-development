@@ -20,17 +20,17 @@ def test_default_generator_mode_is_mock_deterministic(client):
 
 @pytest.mark.optional
 @pytest.mark.integration
-def test_distilgpt2_mode_is_opt_in_and_fails_clearly_when_unavailable(client):
+def test_flan_t5_mode_is_opt_in_and_fails_clearly_when_unavailable(client):
     """
-    Verify that distilgpt2 mode routes through LLM adapter or fails clearly if unavailable.
+    Verify that flan-t5 mode routes through LLM adapter or fails clearly if unavailable.
     
     Spec: generation-optional-llm.md
-    Acceptance Criteria: "With `RAG_GENERATOR=distilgpt2`, app routes generation through LLM adapter"
+    Acceptance Criteria: "With `generator=flan-t5`, app routes generation through LLM adapter"
     """
     payload = {
         "question": "What credit card options do you have?",
         "top_k": 3,
-        "generator": "distilgpt2",
+        "generator": "flan-t5",
     }
     response = client.post("/ask", json=payload)
 
@@ -39,4 +39,4 @@ def test_distilgpt2_mode_is_opt_in_and_fails_clearly_when_unavailable(client):
     if response.status_code in {500, 503}:
         body = response.json()
         as_text = str(body).lower()
-        assert "distilgpt2" in as_text or "model" in as_text
+        assert "flan-t5" in as_text or "model" in as_text

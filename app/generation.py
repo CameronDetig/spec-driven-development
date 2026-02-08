@@ -26,7 +26,7 @@ class MockGenerator:
         )
 
 
-class DistilGPT2Generator:
+class FlanT5Generator:
     def __init__(self) -> None:
         self._llm = None
         self._generator = None
@@ -39,17 +39,14 @@ class DistilGPT2Generator:
             from transformers import pipeline
 
             # Only download via explicit setup command; runtime should be local-only.
+            # Flan-T5 is a seq2seq model designed for instruction following.
             hf_pipeline = pipeline(
-                "text-generation",
-                model="distilgpt2",
-                tokenizer="distilgpt2",
+                "text2text-generation",
+                model="google/flan-t5-small",
                 model_kwargs={"local_files_only": True},
-                max_new_tokens=60,
+                max_new_tokens=100,
                 do_sample=False,
                 num_return_sequences=1,
-                pad_token_id=50256,
-                eos_token_id=50256,
-                return_full_text=False,
             )
             if _use_langchain_generation():
                 from langchain_huggingface import HuggingFacePipeline
@@ -59,7 +56,7 @@ class DistilGPT2Generator:
                 self._generator = hf_pipeline
         except Exception as exc:  # pragma: no cover - depends on local model availability
             raise RuntimeError(
-                "distilgpt2 model is unavailable locally. "
+                "flan-t5-small model is unavailable locally. "
                 "Run `python run.py setup --with-llm` or use generator=mock."
             ) from exc
 
@@ -77,23 +74,20 @@ class DistilGPT2Generator:
         ]
         raw_text = str(generate_rag_answer(question=question, documents=documents, llm=self._llm)).strip()
         
-        # Clean up common repetition patterns from distilgpt2
+        # Flan-T5 produces cleaner output than distilgpt2, but still do basic cleanup
         if raw_text:
-            # Split on newlines and take only the first substantial line
-            first_line = raw_text.split('\n')[0].strip()
-            # Remove repeated "Answer:" patterns
-            while "Answer:" in first_line:
-                first_line = first_line.replace("Answer:", "").strip()
+            # Take first substantial sentence/paragraph
+            first_part = raw_text.split('\n\n')[0].strip()
             
-            # Quality check: distilgpt2 often produces garbage output
-            if self._is_low_quality_output(first_line):
+            # Basic quality check
+            if self._is_low_quality_output(first_part):
                 return ""
             
-            return first_line
+            return first_part
         return ""
 
     def _is_low_quality_output(self, text: str) -> bool:
-        """Detect when distilgpt2 produces nonsensical output."""
+        """Detect when LLM produces nonsensical output."""
         if not text or len(text) < 10:
             return True
         
@@ -112,24 +106,25 @@ class DistilGPT2Generator:
         return False
 
     def _generate_legacy(self, question: str, sources: list[dict]) -> str:
-        context = " ".join(source.get("snippet", "") for source in sources[:2])
-        prompt = f"Question: {question}\nContext: {context}\nAnswer: "
+        # Build context from top sources
+        context_parts = [source.get("snippet", "") for source in sources[:2]]
+        context = " ".join(context_parts)
+        
+        # Flan-T5 works better with clear instruction format
+        prompt = f"Answer the question based on the context.\n\nContext: {context}\n\nQuestion: {question}\n\nAnswer:"
+        
         outputs = self._generator(prompt)
         raw_text = str(outputs[0].get("generated_text", "")).strip() if outputs else ""
         
-        # Clean up common repetition patterns from distilgpt2
         if raw_text:
-            # Split on newlines and take only the first sentence/line
-            first_line = raw_text.split('\n')[0].strip()
-            # Remove repeated "Answer:" patterns
-            while "Answer:" in first_line:
-                first_line = first_line.replace("Answer:", "").strip()
+            # Take first substantial part
+            first_part = raw_text.split('\n\n')[0].strip()
             
-            # Quality check: distilgpt2 often produces garbage output
-            if self._is_low_quality_output(first_line):
+            # Quality check
+            if self._is_low_quality_output(first_part):
                 return ""
             
-            return first_line
+            return first_part
         return ""
 
     def generate(self, question: str, sources: list[dict]) -> str:
@@ -144,11 +139,11 @@ class DistilGPT2Generator:
             else self._generate_legacy(question=question, sources=sources)
         )
         if not text:
-            # distilgpt2 often produces low-quality output; fall back with explanation
+            # LLM produced low-quality output; fall back with explanation
             titles = ", ".join(source["title"] for source in sources[:2])
             return (
                 f"Based on Mockridge Bank FAQ ({titles}), see sources below. "
-                f"(Note: distilgpt2 generation was unreliable for this query. "
+                f"(Note: LLM generation was unreliable for this query. "
                 f"Try 'mock' generator for consistent results.)"
             )
         return text
@@ -156,6 +151,6 @@ class DistilGPT2Generator:
 
 def get_generator(mode: str | None):
     choice = (mode or "mock").strip().lower()
-    if choice == "distilgpt2":
-        return DistilGPT2Generator()
+    if choice == "flan-t5":
+        return FlanT5Generator()
     return MockGenerator()

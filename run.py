@@ -205,7 +205,7 @@ def _download_embedding_model(python_bin: str) -> int:
 
 
 def _download_llm_assets(python_bin: str) -> int:
-    print("Downloading distilgpt2 model assets...")
+    print("Downloading flan-t5-small model assets...")
     hf_env = {**os.environ, "HF_HUB_DISABLE_SYMLINKS_WARNING": "1"}
     return _run(
         [
@@ -214,7 +214,7 @@ def _download_llm_assets(python_bin: str) -> int:
             (
                 "import warnings; warnings.filterwarnings('ignore'); "
                 "from transformers import pipeline; "
-                "pipeline('text-generation', model='distilgpt2', tokenizer='distilgpt2')"
+                "pipeline('text2text-generation', model='google/flan-t5-small')"
             ),
         ],
         env=hf_env,
